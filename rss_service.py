@@ -1,4 +1,4 @@
-import feedparser, json, hashlib, time, threading
+import feedparser, json, hashlib, time, threading, socket
 from datetime import datetime, timezone
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
@@ -11,13 +11,14 @@ _last_fetch = 0
 def fetch_single_feed(source: dict) -> list:
     items = []
     try:
+        socket.setdefaulttimeout(6)
         d = feedparser.parse(source["url"])
         for e in d.entries[:config.MAX_ARTICLES_PER_FEED]:
             title = (e.get("title") or "").strip()
             link = (e.get("link") or "").strip()
             if not title or not link:
                 continue
-            summary = (e.get("summary") or e.get("description") or "")[:600]
+            summary = (e.get("summary") or e.get("description") or "")[:400]
             published = (e.get("published") or e.get("updated") or "")
             items.append({
                 "title": title,
@@ -44,7 +45,7 @@ def fetch_all_news(force=False) -> list:
     sources = get_all_sources()
     all_articles = []
 
-    with ThreadPoolExecutor(max_workers=25) as ex:
+    with ThreadPoolExecutor(max_workers=50) as ex:
         futures = {ex.submit(fetch_single_feed, s): s for s in sources}
         for f in as_completed(futures):
             try:
@@ -76,10 +77,22 @@ def fetch_all_news(force=False) -> list:
 
     return deduped
 
+def _load_cache():
+    global _news_cache
+    try:
+        p = Path(config.CACHE_FILE)
+        if p.exists():
+            with open(p, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            _news_cache = [a for a in data.get("articles", []) if a.get("title")]
+    except:
+        pass
+
 def get_cached_news(lang=None) -> list:
     global _news_cache
     if not _news_cache:
-        return []
+        _load_cache()
+        return _news_cache
     if lang and lang != "all":
         return [a for a in _news_cache if a.get("lang") == lang]
     return _news_cache
