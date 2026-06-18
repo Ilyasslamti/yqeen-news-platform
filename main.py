@@ -8,6 +8,10 @@
 import sys, os, threading
 from pathlib import Path
 
+# Fix console encoding for Windows
+if sys.platform == 'win32':
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+
 BASE = Path(__file__).resolve().parent
 os.chdir(str(BASE))
 sys.path.insert(0, str(BASE))
@@ -20,11 +24,11 @@ threading.Thread(target=background_refresh, daemon=True).start()
 
 from config import GROQ_KEYS
 print('=' * 50)
-print('📰  يقين الصحفي  -  YAQEEN Al-Sahafi')
+print('يقين الصحفي  -  YAQEEN Al-Sahafi')
 print('=' * 50)
-print(f'🔑 مفاتيح Groq: {len(GROQ_KEYS)} (توزيع الأحمال)')
-print(f'📡 مصادر RSS: 141')
-print(f'🌐 الخادم: http://localhost:5000')
+print('Groq keys: %d (Round-Robin)' % len(GROQ_KEYS))
+print('RSS sources: 141')
+print('Server: http://localhost:5000')
 print('=' * 50)
 
 from web_app import app
