@@ -23,9 +23,9 @@ def get_next_groq_key():
 GITHUB_TOKEN = os.getenv('GITHUB_TOKEN', '')
 GITHUB_REPO = 'yqeen-news-platform'
 
-MAX_ARTICLES_PER_FEED = int(os.getenv('MAX_ARTICLES_PER_FEED', '10'))
-CACHE_TTL = int(os.getenv('CACHE_TTL', '300'))
-REFRESH_INTERVAL = int(os.getenv('REFRESH_INTERVAL', '300'))
+MAX_ARTICLES_PER_FEED = int(os.getenv('MAX_ARTICLES_PER_FEED', '5'))
+CACHE_TTL = int(os.getenv('CACHE_TTL', '120'))
+REFRESH_INTERVAL = int(os.getenv('REFRESH_INTERVAL', '180'))
 
 CACHE_FILE = str(_BASE / 'news_cache.json')
 SOURCES_FILE = str(_BASE / 'moroccan_sources.json')

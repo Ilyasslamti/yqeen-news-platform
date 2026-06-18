@@ -39,7 +39,7 @@ def api_news():
         return jsonify({'success': True, 'articles': [], 'count': 0, 'loading': True})
     return jsonify({
         'success': True,
-        'articles': articles[:100],
+        'articles': articles[:80],
         'count': len(articles),
         'language': lang,
     })

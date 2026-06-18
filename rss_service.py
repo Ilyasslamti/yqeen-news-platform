@@ -11,7 +11,7 @@ _last_fetch = 0
 def fetch_single_feed(source: dict) -> list:
     items = []
     try:
-        socket.setdefaulttimeout(6)
+        socket.setdefaulttimeout(4)
         d = feedparser.parse(source["url"])
         for e in d.entries[:config.MAX_ARTICLES_PER_FEED]:
             title = (e.get("title") or "").strip()
@@ -45,13 +45,16 @@ def fetch_all_news(force=False) -> list:
     sources = get_all_sources()
     all_articles = []
 
-    with ThreadPoolExecutor(max_workers=50) as ex:
+    with ThreadPoolExecutor(max_workers=80) as ex:
         futures = {ex.submit(fetch_single_feed, s): s for s in sources}
-        for f in as_completed(futures):
+        deadline = time.time() + 25
+        for f in as_completed(futures, timeout=25):
             try:
                 all_articles.extend(f.result())
             except:
                 pass
+            if time.time() > deadline:
+                break
 
     seen = set()
     deduped = []
