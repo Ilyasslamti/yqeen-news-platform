@@ -11,8 +11,9 @@ BASE = Path(__file__).resolve().parent
 os.chdir(str(BASE))
 sys.path.insert(0, str(BASE))
 
-from config import GROQ_KEYS, REFRESH_INTERVAL
+from config import GROQ_KEYS, REFRESH_INTERVAL, CACHE_TTL
 from rss_service import fetch_all_news, get_cached_news
+import config
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
@@ -32,10 +33,10 @@ def index():
 @app.route('/api/news')
 def api_news():
     lang = request.args.get('lang', 'all')
-    articles = get_cached_news(lang)
-    if not articles:
+    stale = time.time() - config._last_fetch > CACHE_TTL if config._last_fetch > 0 else True
+    if stale:
         threading.Thread(target=fetch_all_news, daemon=True).start()
-        return jsonify({'success': True, 'articles': [], 'count': 0, 'loading': True})
+    articles = get_cached_news(lang)
     return jsonify({
         'success': True,
         'articles': articles[:80],
