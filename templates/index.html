@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>يقين الصحفي - منصة الأخبار المغربية</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap');
+:root{--bg:#0a0a0f;--card:#12121a;--hover:#181825;--accent:#ff6b35;--accent2:#7c3aed;--gold:#f59e0b;--text:#e8e8ee;--dim:#8888a0;--border:#1e1e30;--radius:12px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Tajawal','Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+.nav{position:sticky;top:0;z-index:100;background:rgba(10,10,15,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-size:22px;font-weight:900;color:var(--accent)}
+.nav-logo span{color:var(--gold)}
+.nav-stats{font-size:13px;color:var(--dim);display:flex;gap:16px;align-items:center}
+.nav-btn{background:var(--accent);border:none;color:#fff;padding:8px 24px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700;font-family:inherit;transition:.2s}
+.nav-btn:hover{background:#e55a2b}
+.lang-bar{display:flex;gap:6px;padding:12px 24px;overflow-x:auto;scrollbar-width:none;background:rgba(10,10,15,.5);border-bottom:1px solid var(--border)}
+.lang-btn{background:var(--card);border:1px solid var(--border);color:var(--dim);padding:8px 20px;border-radius:20px;cursor:pointer;font-size:14px;font-weight:500;transition:all .2s;white-space:nowrap;font-family:inherit}
+.lang-btn:hover{border-color:var(--accent);color:var(--text)}
+.lang-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.container{max-width:1400px;margin:0 auto;padding:16px 24px 80px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;transition:all .25s;cursor:pointer;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));opacity:0;transition:.25s}
+.card:hover{background:var(--hover);border-color:var(--accent);transform:translateY(-2px);box-shadow:0 4px 24px rgba(0,0,0,.3)}
+.card:hover::before{opacity:1}
+.card-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--gold);margin-bottom:8px;letter-spacing:.5px}
+.card-source{color:var(--dim);font-size:11px;margin-right:8px}
+.card-title{font-size:16px;font-weight:700;line-height:1.5;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.card-summary{font-size:13px;color:var(--dim);line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:12px;flex:1}
+.card-meta{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--dim);padding-top:12px;border-top:1px solid var(--border);margin-top:auto}
+.loading{display:flex;align-items:center;justify-content:center;min-height:300px;flex-direction:column;gap:16px;color:var(--dim)}
+.spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:800px;width:100%;max-height:90vh;overflow-y:auto;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,.5);animation:modal-in .3s ease}
+@keyframes modal-in{from{opacity:0;transform:translateY(20px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+.modal-close{float:left;background:none;border:none;color:var(--dim);font-size:28px;cursor:pointer;transition:color .2s;line-height:1}
+.modal-close:hover{color:var(--accent)}
+.modal h2{font-size:22px;margin-bottom:4px;line-height:1.4}
+.modal .sub{color:var(--dim);font-size:14px;margin-bottom:20px}
+.modal .label{font-size:12px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-top:20px;margin-bottom:8px}
+.modal .text-box{background:rgba(255,255,255,.03);border-radius:8px;padding:16px;font-size:14px;line-height:1.8;white-space:pre-wrap;word-wrap:break-word;max-height:300px;overflow-y:auto;font-family:inherit}
+.modal .text-box.rewritten{border-right:3px solid var(--accent)}
+.controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:16px 0}
+.controls select{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px 16px;border-radius:8px;font-size:14px;font-family:inherit;cursor:pointer}
+.controls .btn{background:var(--accent);border:none;color:#fff;padding:10px 28px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:700;transition:.2s;font-family:inherit}
+.controls .btn:hover{background:#e55a2b}
+.controls .btn:disabled{opacity:.5;cursor:wait}
+.controls .btn.secondary{background:var(--card);border:1px solid var(--border);color:var(--text)}
+.controls .btn.secondary:hover{border-color:var(--accent)}
+.footer{text-align:center;padding:32px 24px;color:var(--dim);font-size:13px;border-top:1px solid var(--border);margin-top:40px}
+.footer a{color:var(--accent);text-decoration:none}
+.toast{position:fixed;bottom:30px;right:30px;background:var(--accent);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;opacity:0;transform:translateY(20px);transition:all .3s;z-index:2000}
+.toast.show{opacity:1;transform:translateY(0)}
+@media(max-width:640px){.grid{grid-template-columns:1fr}.container{padding:12px 16px 60px}.modal{padding:20px}.lang-bar{padding:8px 16px;gap:4px}.lang-btn{padding:6px 12px;font-size:13px}}
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="nav-logo">📰 يقين <span>الصحفي</span></div>
+  <div class="nav-stats">
+    <span id="statsArticles">0</span> خبر
+    <span id="statsSources" style="color:var(--dim)">0</span> مصدر
+    <button class="nav-btn" onclick="refreshNews()">⟳ تحديث</button>
+  </div>
+</div>
+
+<div class="lang-bar" id="langBar"></div>
+
+<div class="container">
+  <div id="content">
+    <div class="loading">
+      <div class="spinner"></div>
+      <div>جاري تحميل الأخبار من المصادر المغربية...</div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <a href="https://github.com/Ilyasslamti/yqeen-news-platform" target="_blank">يقين الصحفي</a> · Manadger Tech ·
+  <span id="footerStats"></span>
+</div>
+
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">&times;</button>
+    <h2 id="modalTitle">...</h2>
+    <div class="sub" id="modalSub"></div>
+
+    <div class="label">النص الأصلي</div>
+    <div class="text-box" id="modalOriginal">جاري تحميل المقال...</div>
+
+    <div class="controls">
+      <span style="font-size:13px;color:var(--dim)">إعادة الصياغة إلى:</span>
+      <select id="targetLang">
+        <option value="ar">العربية</option>
+        <option value="fr">Français</option>
+        <option value="en">English</option>
+      </select>
+      <button class="btn" id="rewriteBtn" onclick="doRewrite()">⟳ صياغة احترافية</button>
+      <button class="btn secondary" onclick="copyResult()">📋 نسخ</button>
+      <button class="btn secondary" onclick="openOriginal()">🔗 فتح الرابط</button>
+    </div>
+
+    <div class="label">الصياغة الاحترافية</div>
+    <div class="text-box rewritten" id="modalRewritten">انقر "صياغة احترافية" لتوليد نسخة صحفية...</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const LANG_MAP = {
+  ar: { label: 'العربية', color: '#f59e0b' },
+  fr: { label: 'Français', color: '#3b82f6' },
+  en: { label: 'English', color: '#10b981' },
+};
+const LANG_ORDER = ['ar', 'fr', 'en'];
+let articles = [];
+let currentArticle = null;
+let loadingModal = false;
+
+// Init
+fetchNews();
+
+// Language bar
+(function(){
+  const bar = document.getElementById('langBar');
+  const allBtn = document.createElement('button');
+  allBtn.className = 'lang-btn active';
+  allBtn.textContent = 'الكل';
+  allBtn.onclick = () => setLang('all', allBtn);
+  bar.appendChild(allBtn);
+  LANG_ORDER.forEach(k => {
+    const m = LANG_MAP[k];
+    if (!m) return;
+    const btn = document.createElement('button');
+    btn.className = 'lang-btn';
+    btn.textContent = m.label;
+    btn.dataset.lang = k;
+    btn.onclick = (e) => setLang(k, btn);
+    bar.appendChild(btn);
+  });
+})();
+
+let currentLang = 'all';
+function setLang(lang, btn) {
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  fetchNews(lang);
+}
+
+async function fetchNews(lang) {
+  const el = document.getElementById('content');
+  el.innerHTML = '<div class="loading"><div class="spinner"></div><div>جاري التحميل...</div></div>';
+  try {
+    const r = await fetch('/api/news?lang=' + lang);
+    const d = await r.json();
+    articles = d.articles || [];
+    renderNews(articles);
+    updateStats(d.count, articles);
+  } catch(e) {
+    el.innerHTML = '<div class="loading"><h2 style="color:var(--accent)">خطأ في الاتصال</h2><p style="color:var(--dim)">الخادم قد يكون مشغولاً</p><button class="nav-btn" onclick="fetchNews(\''+lang+'\')">إعادة المحاولة</button></div>';
+  }
+}
+
+function renderNews(articles) {
+  const el = document.getElementById('content');
+  if (!articles || articles.length === 0) {
+    el.innerHTML = '<div class="loading"><h2 style="color:var(--dim)">لا توجد أخبار</h2><p style="color:var(--dim)">اختر لغة أخرى أو انقر تحديث</p></div>';
+    return;
+  }
+  let html = '<div class="grid">';
+  articles.forEach((a, i) => {
+    const m = LANG_MAP[a.lang] || { label: a.lang || '', color: '#8888a0' };
+    html += '<div class="card" onclick="openArticle(\''+a.id+'\')">';
+    html += '<div class="card-badge" style="color:'+m.color+'">'+m.label+'</div>';
+    html += '<div class="card-title">'+esc(a.title||'')+'</div>';
+    html += '<div class="card-summary">'+esc((a.summary||'').slice(0,250))+'</div>';
+    html += '<div class="card-meta">';
+    html += '<span class="card-source">'+esc(a.source_name||'')+'</span>';
+    html += '<span>⟳ أعد الصياغة</span>';
+    html += '</div></div>';
+  });
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+function updateStats(count, articles) {
+  document.getElementById('statsArticles').textContent = count;
+  document.getElementById('statsSources').textContent = articles.length ? articles[0].source_name ? '141' : '0' : '0';
+}
+
+async function openArticle(id) {
+  currentArticle = articles.find(a => a.id === id);
+  if (!currentArticle) return;
+  document.getElementById('modalTitle').textContent = currentArticle.title;
+  document.getElementById('modalSub').textContent = currentArticle.source_name + ' · ' + (LANG_MAP[currentArticle.lang]?.label || '');
+  document.getElementById('modalOriginal').textContent = 'جاري تحميل المحتوى الكامل...';
+  document.getElementById('modalRewritten').textContent = 'انقر "صياغة احترافية" لتوليد نسخة صحفية...';
+  document.getElementById('targetLang').value = currentArticle.lang || 'ar';
+  document.getElementById('modal').classList.add('open');
+  loadingModal = true;
+
+  try {
+    const r = await fetch('/api/extract', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ url: currentArticle.link })
+    });
+    const d = await r.json();
+    document.getElementById('modalOriginal').textContent = d.text || currentArticle.summary || currentArticle.title;
+  } catch(e) {
+    document.getElementById('modalOriginal').textContent = currentArticle.summary || currentArticle.title;
+  }
+  loadingModal = false;
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  currentArticle = null;
+}
+
+async function doRewrite() {
+  const text = document.getElementById('modalOriginal').textContent;
+  if (!text || text.length < 20) return;
+  if (text === 'جاري تحميل المحتوى الكامل...' || text === 'جاري تحميل المقال...') return showToast('انتظر حتى يكتمل التحميل');
+
+  const lang = document.getElementById('targetLang').value;
+  const btn = document.getElementById('rewriteBtn');
+  btn.disabled = true;
+  btn.textContent = 'جاري الصياغة...';
+  document.getElementById('modalRewritten').textContent = 'جاري توليد الصياغة الاحترافية...';
+
+  try {
+    const r = await fetch('/api/rewrite', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ text: text.slice(0,4000), lang })
+    });
+    const d = await r.json();
+    document.getElementById('modalRewritten').textContent = d.rewritten || 'فشلت إعادة الصياغة';
+  } catch(e) {
+    document.getElementById('modalRewritten').textContent = 'خطأ: ' + e.message;
+  }
+  btn.disabled = false;
+  btn.textContent = '⟳ صياغة احترافية';
+}
+
+function copyResult() {
+  const text = document.getElementById('modalRewritten').textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('تم النسخ'));
+}
+
+function openOriginal() {
+  if (currentArticle && currentArticle.link) window.open(currentArticle.link, '_blank');
+}
+
+function refreshNews() {
+  document.getElementById('content').innerHTML = '<div class="loading"><div class="spinner"></div><div>جاري التحديث...</div></div>';
+  fetch('/api/refresh').then(r => r.json()).then(() => {
+    setTimeout(() => fetchNews(currentLang), 2000);
+  });
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function esc(s) {
+  if (!s) return '';
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+document.addEventListener('click', e => { if (e.target.classList.contains('modal-overlay')) closeModal(); });
+</script>
+</body>
+</html>
