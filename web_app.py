@@ -11,13 +11,12 @@ BASE = Path(__file__).resolve().parent
 os.chdir(str(BASE))
 sys.path.insert(0, str(BASE))
 
-from config import GROQ_KEYS
-from rss_service import fetch_all_news, get_cached_news, background_refresh
+from config import GROQ_KEYS, REFRESH_INTERVAL
+from rss_service import fetch_all_news, get_cached_news
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
-
-_THREAD_LOCK = threading.Lock()
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 300
 
 @app.after_request
 def add_cors(resp):
@@ -95,8 +94,17 @@ def api_stats():
 
 from rss_sources import MOROCCAN_SOURCES
 
+@app.route('/health')
+def health():
+    articles = get_cached_news()
+    return jsonify({
+        'status': 'ok',
+        'articles': len(articles),
+        'sources': 141,
+    })
+
 if __name__ == '__main__':
-    print('Starting YAQEEN Al-Sahafi Web Server...')
+    from rss_service import background_refresh
     threading.Thread(target=background_refresh, daemon=True).start()
     port = int(os.getenv('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False, threaded=True)
